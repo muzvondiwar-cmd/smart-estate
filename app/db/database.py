@@ -1,15 +1,24 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
-from app.core.config import settings
 
-# We use a standard synchronous engine for simplicity and compatibility
-# In extremely high-load scenarios, we might switch to AsyncEngine later
-engine = create_engine(settings.DATABASE_URL)
+# --- FORCE SQLITE DATABASE ---
+# We are hardcoding this to ensure it works on Render without complex setup.
+SQLALCHEMY_DATABASE_URL = "sqlite:///./smart_estate.db"
+
+# Create the database engine
+# connect_args={"check_same_thread": False} is REQUIRED for SQLite
+engine = create_engine(
+    SQLALCHEMY_DATABASE_URL,
+    connect_args={"check_same_thread": False}
+)
+
+# Create the SessionLocal class
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
+# Create the Base class
 Base = declarative_base()
 
-# Dependency to get DB session per request
+# Dependency function to get the database session
 def get_db():
     db = SessionLocal()
     try:
