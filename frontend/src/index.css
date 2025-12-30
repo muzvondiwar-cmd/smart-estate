@@ -1,0 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* GLOBAL RESET: Forces the app to fill the screen */
+html, body {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden; /* Prevents accidental horizontal scrolling */
+  background-color: #f9fafb; /* Matches Tailwind 'bg-gray-50' */
+}
+
+/* REACT ROOT: The main container for your app */
+#root {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Centers the App wrapper horizontally */
+}
+
+/* APP WRAPPER: Ensures the direct child of root takes full width */
+#root > div {
+  width: 100%;
+}
