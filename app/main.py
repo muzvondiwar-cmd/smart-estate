@@ -1,43 +1,33 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
-import os
-
-# Import your routes and database models
 from app.api.v1.api import api_router
-from app.db.database import engine
 from app.db import models
+from app.db.database import engine
 
-# 1. Initialize the Database Tables
+# Create the database tables automatically (if they don't exist)
 models.Base.metadata.create_all(bind=engine)
 
-# 2. Create the App
 app = FastAPI(title="SmartEstate AI API")
 
-# 3. CORS SETTINGS (Crucial for Deployment)
-# We are allowing ["*"] so your Frontend (Vercel) can talk to this Backend (Render) without blocking.
+# --- 🔓 SECURITY SETTINGS (CORS) ---
+# We use ["*"] to allow ALL connections. This fixes the connection error
+# between your Vercel Frontend and Render Backend.
+origins = ["*"]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # <--- ALLOWS ALL CONNECTIONS
+    allow_origins=origins,       # Allows any website to connect
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["*"],         # Allows all methods (GET, POST, etc.)
+    allow_headers=["*"],         # Allows all headers
 )
 
-# 4. IMAGE HANDLING
-# Check if "uploads" folder exists, if not, create it.
-if not os.path.exists("uploads"):
-    os.makedirs("uploads")
-
-# Mount the folder so images can be accessed via URL (e.g., http://.../uploads/image.jpg)
-app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
-
-# 5. CONNECT ROUTES
-# This connects all your logic (Auth, Properties, Search) to the app.
+# --- ROUTES ---
+# Include all your API endpoints (properties, auth, etc.)
 app.include_router(api_router, prefix="/api/v1")
 
-# 6. ROOT CHECK
-# A simple message to verify the server is running.
+# --- HEALTH CHECK ---
+# This is the message you saw on the blue docs page
 @app.get("/")
-def read_root():
+def root():
     return {"message": "✅ SmartEstate AI Backend is Running!"}
