@@ -39,10 +39,10 @@ const Footer = () => {
               <a href="#" className="w-10 h-10 rounded-full bg-blue-800 flex items-center justify-center hover:bg-blue-600 transition">
                 <Github className="w-5 h-5" />
               </a>
-              <a href="#" className="w-10 h-10 rounded-full bg-blue-800 flex items-center justify-center hover:bg-blue-600 transition">
+              <a href="www.linkedin.com/in/roy-panashe-muzvondiwa-54a532348" className="w-10 h-10 rounded-full bg-blue-800 flex items-center justify-center hover:bg-blue-600 transition">
                 <Linkedin className="w-5 h-5" />
               </a>
-              <a href="mailto:your-email@example.com" className="w-10 h-10 rounded-full bg-blue-800 flex items-center justify-center hover:bg-blue-600 transition">
+              <a href="mailto:muzvondiwapanashe@gmail.com" className="w-10 h-10 rounded-full bg-blue-800 flex items-center justify-center hover:bg-blue-600 transition">
                 <Mail className="w-5 h-5" />
               </a>
             </div>
@@ -65,8 +65,10 @@ const Footer = () => {
         <div className="flex flex-col md:flex-row justify-between items-center text-sm text-blue-300">
           <p>&copy; {currentYear} SmartEstate AI. All rights reserved.</p>
           <p className="flex items-center gap-1 mt-2 md:mt-0">
-            Designed & Developed by <span className="text-white font-bold">Roy Muzvondiwa</span>
-            <Heart className="w-3 h-3 text-red-500 fill-current" />
+            Designed & Developed by <span className="text-white font-bold">
+              <a href="www.linkedin.com/in/roy-panashe-muzvondiwa-54a532348">
+                  Roy Panashe Muzvondiwa
+              </a></span>
           </p>
         </div>
 
