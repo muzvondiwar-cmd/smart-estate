@@ -7,11 +7,11 @@ import AddProperty from './pages/AddProperty';
 import PropertyDetails from './pages/PropertyDetails';
 import Report from './pages/Report';
 import SellerDashboard from './pages/SellerDashboard';
-// import Login from './pages/Login'; // Uncomment if you have these
-// import Signup from './pages/Signup';
+import Login from './pages/Login'; // Uncomment if you have these
+import Signup from './pages/Signup';
 
 import Navbar from './components/Navbar';
-// import Footer from './components/Footer';
+import Footer from './components/Footer';
 
 function App() {
     return (
@@ -21,7 +21,7 @@ function App() {
                 {/* Navbar sits on top */}
                 <Navbar />
 
-                {/* ✅ GLOBAL FIX: added 'pt-20' here.
+                {/* GLOBAL FIX: added 'pt-20' here.
             This pushes ALL page content down so the Navbar doesn't cover it.
         */}
                 <main className="flex-grow pt-20">
@@ -32,12 +32,12 @@ function App() {
                         <Route path="/property/:id/report" element={<Report />} />
                         <Route path="/dashboard" element={<SellerDashboard />} />
 
-                        {/* <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} /> */}
+                        <Route path="/login" element={<Login />} />
+                        <Route path="/signup" element={<Signup />} />
                     </Routes>
                 </main>
 
-                {/* <Footer /> */}
+                <Footer />
             </div>
         </Router>
     );
