@@ -13,10 +13,10 @@ import Navbar from './components/Navbar';
 
 // --- OPTIONAL PAGES (Commented out to prevent crashes) ---
 // If you have these files, remove the "//" to enable them.
-// import SellerDashboard from './pages/SellerDashboard';
-// import Login from './pages/Login';
-// import Signup from './pages/Signup';
-// import Footer from './components/Footer';
+import SellerDashboard from './pages/SellerDashboard';
+import Login from './pages/Login';
+import Signup from './pages/Signup';
+import Footer from './components/Footer';
 
 function App() {
     return (
@@ -32,15 +32,14 @@ function App() {
                         <Route path="/add-property" element={<AddProperty />} />
                         <Route path="/property/:id" element={<PropertyDetails />} />
                         <Route path="/property/:id/report" element={<Report />} />
+                        <Route path="/dashboard" element={<SellerDashboard />} />
+                        <Route path="/login" element={<Login />} />
+                        <Route path="/signup" element={<Signup />} />
 
-                        {/* <Route path="/dashboard" element={<SellerDashboard />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            */}
                     </Routes>
                 </main>
 
-                {/* <Footer /> */}
+                <Footer />
             </div>
         </Router>
     );
