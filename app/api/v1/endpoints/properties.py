@@ -54,3 +54,37 @@ def read_property(property_id: int, db: Session = Depends(database.get_db)):
     if db_property is None:
         raise HTTPException(status_code=404, detail="Property not found")
     return db_property
+
+# --- 5. GENERATE FULL AI REPORT ---
+@router.get("/{property_id}/report")
+def generate_report(property_id: int, db: Session = Depends(database.get_db)):
+    """
+    Generates a detailed AI Due Diligence Report.
+    """
+    db_property = db.query(models.Property).filter(models.Property.id == property_id).first()
+    if db_property is None:
+        raise HTTPException(status_code=404, detail="Property not found")
+
+    # 🤖 SIMULATE DEEP ANALYSIS DATA
+    # In a real app, this would query the Deeds Office API.
+    return {
+        "property_id": db_property.id,
+        "generated_at": "2025-01-01",
+        "risk_score": db_property.risk_score,
+        "valuation": {
+            "estimated_value": db_property.price * 0.95,
+            "market_trend": "Rising (+5% this year)",
+            "price_per_sqm": db_property.price / db_property.land_size if db_property.land_size else 0
+        },
+        "legal_checks": [
+            {"check": "Title Deed Authenticity", "status": "PASSED", "details": "Deed #4529 matches central registry."},
+            {"check": "Encumbrances / Liens", "status": "PASSED", "details": "No outstanding bank loans found."},
+            {"check": "Seller Identity", "status": "PASSED", "details": "Biometric ID match confirmed."},
+            {"check": "Zoning Regulations", "status": "WARNING", "details": "Property is near a wetland buffer zone."}
+        ],
+        "history": [
+            {"date": "2023-05-12", "event": "Property Listed for Sale"},
+            {"date": "2018-11-04", "event": "Ownership Transfer (Sold)"},
+            {"date": "2010-02-20", "event": "Initial Registration"}
+        ]
+    }
