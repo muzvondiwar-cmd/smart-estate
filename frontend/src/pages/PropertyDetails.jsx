@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
-import { MapPin, BedDouble, Bath, Square, ShieldCheck, AlertTriangle, CheckCircle, XCircle, FileText, ArrowLeft } from 'lucide-react';
-import { API_URL } from '../config'; // <--- The Critical Fix
+import { MapPin, BedDouble, Bath, Square, ShieldCheck, CheckCircle, AlertTriangle, FileText, ArrowLeft } from 'lucide-react';
+import { API_URL } from '../config';
 
 const PropertyDetails = () => {
     const { id } = useParams();
@@ -13,7 +13,6 @@ const PropertyDetails = () => {
     useEffect(() => {
         const fetchProperty = async () => {
             try {
-                // Fetch specific property by ID
                 const response = await axios.get(`${API_URL}/api/v1/properties/${id}`);
                 setProperty(response.data);
                 setLoading(false);
@@ -54,7 +53,7 @@ const PropertyDetails = () => {
             <div className="h-[40vh] md:h-[50vh] relative bg-gray-900">
                 {property.images && property.images.length > 0 ? (
                     <img
-                        src={`${API_URL}${property.images[0].image_url}`}
+                        src={property.images[0].image_url.startsWith('http') ? property.images[0].image_url : `${API_URL}${property.images[0].image_url}`}
                         alt={property.title}
                         className="w-full h-full object-cover opacity-80"
                         onError={(e) => e.target.src = "https://via.placeholder.com/800x600?text=No+Image"}
@@ -64,7 +63,7 @@ const PropertyDetails = () => {
                 )}
 
                 {/* Back Button */}
-                <Link to="/" className="absolute top-6 left-6 bg-white/90 p-2 rounded-full hover:bg-white transition shadow-sm">
+                <Link to="/" className="absolute top-6 left-6 bg-white/90 p-2 rounded-full hover:bg-white transition shadow-sm z-10">
                     <ArrowLeft className="w-5 h-5 text-gray-800" />
                 </Link>
 
@@ -124,7 +123,6 @@ const PropertyDetails = () => {
                             {property.description || "No description provided."}
                         </p>
                     </div>
-
                 </div>
 
                 {/* --- AI ANALYSIS SIDEBAR (Right) --- */}
@@ -173,9 +171,14 @@ const PropertyDetails = () => {
                         </div>
 
                         <div className="mt-6 pt-6 border-t border-gray-100">
-                            <button className="w-full py-3 bg-gray-900 hover:bg-blue-600 text-white font-medium rounded-lg transition shadow-lg shadow-blue-900/10 flex items-center justify-center gap-2">
-                                <FileText className="w-4 h-4" /> Request Full Report
-                            </button>
+                            {/* ✅ BUTTON FIXED: NOW LINKS TO REPORT PAGE */}
+                            <Link
+                                to={`/property/${id}/report`}
+                                className="w-full py-3 bg-gray-900 hover:bg-blue-600 text-white font-medium rounded-lg transition shadow-lg shadow-blue-900/10 flex items-center justify-center gap-2"
+                            >
+                                <FileText className="w-4 h-4" />
+                                Request Full Report
+                            </Link>
                         </div>
                     </div>
 
