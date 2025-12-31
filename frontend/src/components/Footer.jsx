@@ -39,7 +39,7 @@ const Footer = () => {
               <a href="#" className="w-10 h-10 rounded-full bg-blue-800 flex items-center justify-center hover:bg-blue-600 transition">
                 <Github className="w-5 h-5" />
               </a>
-              <a href="www.linkedin.com/in/roy-panashe-muzvondiwa-54a532348" className="w-10 h-10 rounded-full bg-blue-800 flex items-center justify-center hover:bg-blue-600 transition">
+              <a href="https://www.linkedin.com/in/roy-panashe-muzvondiwa-54a532348" className="w-10 h-10 rounded-full bg-blue-800 flex items-center justify-center hover:bg-blue-600 transition">
                 <Linkedin className="w-5 h-5" />
               </a>
               <a href="mailto:muzvondiwapanashe@gmail.com" className="w-10 h-10 rounded-full bg-blue-800 flex items-center justify-center hover:bg-blue-600 transition">
@@ -66,7 +66,7 @@ const Footer = () => {
           <p>&copy; {currentYear} SmartEstate AI. All rights reserved.</p>
           <p className="flex items-center gap-1 mt-2 md:mt-0">
             Designed & Developed by <span className="text-white font-bold">
-              <a href="www.linkedin.com/in/roy-panashe-muzvondiwa-54a532348">
+              <a href="https://www.linkedin.com/in/roy-panashe-muzvondiwa-54a532348">
                   Roy Panashe Muzvondiwa
               </a></span>
           </p>
