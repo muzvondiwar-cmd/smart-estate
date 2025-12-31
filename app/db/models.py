@@ -1,57 +1,40 @@
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Float, Text, DateTime
+from sqlalchemy import Column, Integer, String, Float, Boolean, ForeignKey
 from sqlalchemy.orm import relationship
-from datetime import datetime
 from app.db.database import Base
 
 class User(Base):
     __tablename__ = "users"
-
     id = Column(Integer, primary_key=True, index=True)
     email = Column(String, unique=True, index=True)
+    full_name = Column(String)
     hashed_password = Column(String)
-    is_active = Column(Boolean, default=True)
-
-    properties = relationship("Property", back_populates="owner")
+    role = Column(String, default="user")
 
 class Property(Base):
     __tablename__ = "properties"
-
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String, index=True)
-    description = Column(Text)
+    description = Column(String)
     price = Column(Float)
-
-    # --- NEW FIELDS ---
-    location = Column(String)  # <--- This was missing!
-    city = Column(String, index=True)
-    suburb = Column(String, index=True)
-
+    location = Column(String)
+    city = Column(String)
+    suburb = Column(String)
     bedrooms = Column(Integer)
-    bathrooms = Column(Float)  # Changed from Integer to Float (allows 2.5 baths)
+    bathrooms = Column(Integer)
     land_size = Column(Integer)
+    listing_status = Column(String)
     property_type = Column(String)
 
-    listing_status = Column(String, default="For Sale") # <--- This was missing!
-    electricity_status = Column(String) # <--- This was missing!
-    created_at = Column(DateTime, default=datetime.utcnow) # <--- This was missing!
-
-    # Risk Factors
-    ownership_status = Column(String)
-    water_source = Column(String)
-    risk_score = Column(Integer, default=0)
-    risk_notes = Column(Text)
+    # ✅ AI FIELDS
+    risk_score = Column(Integer, default=0) # We added this!
 
     owner_id = Column(Integer, ForeignKey("users.id"))
-    owner = relationship("User", back_populates="properties")
-
-    images = relationship("PropertyImage", back_populates="property", cascade="all, delete-orphan")
+    images = relationship("PropertyImage", back_populates="property")
 
 class PropertyImage(Base):
     __tablename__ = "property_images"
-
     id = Column(Integer, primary_key=True, index=True)
     property_id = Column(Integer, ForeignKey("properties.id"))
     image_url = Column(String)
-    is_thumbnail = Column(Boolean, default=False)
 
     property = relationship("Property", back_populates="images")

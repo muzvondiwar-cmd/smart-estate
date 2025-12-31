@@ -15,14 +15,23 @@ class PropertyBase(BaseModel):
     listing_status: str
     property_type: str
 
-# --- CREATION SCHEMA (What we send to API) ---
 class PropertyCreate(PropertyBase):
-    pass
+    images: Optional[List[dict]] = []
 
-# --- RESPONSE SCHEMA (What API sends back) ---
+class PropertyImage(BaseModel):
+    id: int
+    image_url: str
+    class Config:
+        from_attributes = True
+
+# --- RESPONSE SCHEMA ---
 class Property(PropertyBase):
     id: int
-    owner_id: Optional[int] = None  # Make optional for now to prevent errors
+    owner_id: Optional[int] = None
+    images: List[PropertyImage] = []
+
+    # ✅ INCLUDE RISK SCORE IN RESPONSE
+    risk_score: int = 0
 
     class Config:
-        from_attributes = True  # Required for Pydantic V2 to read SQLAlchemy models
+        from_attributes = True
