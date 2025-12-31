@@ -3,6 +3,7 @@ import random # <--- Import this for the AI simulation
 from fastapi import APIRouter, Depends, HTTPException, File, UploadFile
 from sqlalchemy.orm import Session
 from app.db import database, models, schemas
+from pydantic import BaseModel
 
 router = APIRouter()
 
@@ -88,3 +89,27 @@ def generate_report(property_id: int, db: Session = Depends(database.get_db)):
             {"date": "2010-02-20", "event": "Initial Registration"}
         ]
     }
+
+# --- SIMPLE SCHEMA FOR MESSAGES ---
+class ContactRequest(BaseModel):
+    name: str
+    email: str
+    phone: str
+    message: str
+
+# --- 6. CONTACT SELLER ENDPOINT ---
+@router.post("/{property_id}/contact")
+def contact_seller(property_id: int, contact: ContactRequest, db: Session = Depends(database.get_db)):
+    """
+    Simulates sending an inquiry email to the property owner.
+    """
+    # Check if property exists
+    db_property = db.query(models.Property).filter(models.Property.id == property_id).first()
+    if not db_property:
+        raise HTTPException(status_code=404, detail="Property not found")
+
+    # In a real app, we would trigger an email service like SendGrid here.
+    # For now, we just acknowledge receipt.
+    print(f"📩 NEW LEAD for Property {property_id}: {contact.name} ({contact.email}) says: {contact.message}")
+
+    return {"status": "success", "message": "Inquiry sent successfully! The agent will contact you shortly."}
