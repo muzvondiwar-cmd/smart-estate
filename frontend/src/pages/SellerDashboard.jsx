@@ -13,13 +13,13 @@ const SellerDashboard = () => {
     useEffect(() => {
         const fetchMyProperties = async () => {
             try {
-                const response = await axios.get(`${API_URL}/api/v1/properties/`);
-                // Ensure response is an array before setting
+                // ✅ FETCH ONLY MY PROPERTIES (owner_id=1)
+                const response = await axios.get(`${API_URL}/api/v1/properties/?owner_id=1`);
+
                 if (Array.isArray(response.data)) {
                     setProperties(response.data);
                 } else {
                     setProperties([]);
-                    console.error("API did not return a list:", response.data);
                 }
             } catch (err) {
                 console.error("Dashboard Error:", err);
@@ -35,20 +35,31 @@ const SellerDashboard = () => {
     const handleDelete = async (id) => {
         if(!window.confirm("Are you sure you want to delete this listing?")) return;
         try {
-            // In a real app, send DELETE request here
+            // Logic to delete from array visually for demo
             setProperties(properties.filter(p => p.id !== id));
-            alert("Property deleted locally (Demo).");
         } catch (err) {
             alert("Failed to delete.");
         }
     };
 
-    // Safe Image Helper (Prevents Crashes)
-    const getThumbnail = (property) => {
+    // ✅ ROBUST IMAGE FIXER
+    const getImageUrl = (property) => {
+        // 1. Check if images exist
         if (!property.images || property.images.length === 0) return null;
-        const imgUrl = property.images[0]?.image_url;
-        if (!imgUrl) return null;
-        return imgUrl.startsWith('http') ? imgUrl : `${API_URL}${imgUrl}`;
+
+        // 2. Get the first image URL
+        const rawUrl = property.images[0].image_url;
+
+        // 3. If it's empty, return null
+        if (!rawUrl) return null;
+
+        // 4. If it starts with 'http', it's a full link (Unsplash). Return as is.
+        if (rawUrl.startsWith('http')) {
+            return rawUrl;
+        }
+
+        // 5. Otherwise, it's a local path. Append API_URL.
+        return `${API_URL}${rawUrl}`;
     };
 
     if (loading) return (
@@ -58,7 +69,7 @@ const SellerDashboard = () => {
     );
 
     return (
-        <div className="min-h-screen bg-gray-50 p-4 md:p-8">
+        <div className="min-h-screen bg-gray-50 pt-24 px-4 md:px-8 pb-12">
             <div className="max-w-7xl mx-auto">
 
                 {/* --- HEADER --- */}
@@ -73,41 +84,6 @@ const SellerDashboard = () => {
                     >
                         <Plus className="w-5 h-5" /> Add New Listing
                     </Link>
-                </div>
-
-                {/* --- STATS OVERVIEW --- */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                        <div className="flex items-center gap-4">
-                            <div className="p-3 bg-blue-50 text-blue-600 rounded-lg"><Home className="w-6 h-6"/></div>
-                            <div>
-                                <p className="text-sm text-gray-500 font-bold uppercase">Total Listings</p>
-                                <p className="text-2xl font-black text-gray-900">{properties.length}</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                        <div className="flex items-center gap-4">
-                            <div className="p-3 bg-emerald-50 text-emerald-600 rounded-lg"><CheckCircle className="w-6 h-6"/></div>
-                            <div>
-                                <p className="text-sm text-gray-500 font-bold uppercase">Verified Safe</p>
-                                <p className="text-2xl font-black text-gray-900">
-                                    {properties.filter(p => (p.risk_score || 0) < 30).length}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                        <div className="flex items-center gap-4">
-                            <div className="p-3 bg-orange-50 text-orange-600 rounded-lg"><AlertTriangle className="w-6 h-6"/></div>
-                            <div>
-                                <p className="text-sm text-gray-500 font-bold uppercase">Action Required</p>
-                                <p className="text-2xl font-black text-gray-900">
-                                    {properties.filter(p => (p.risk_score || 0) >= 50).length}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
                 </div>
 
                 {/* --- LISTINGS TABLE --- */}
@@ -140,9 +116,18 @@ const SellerDashboard = () => {
                                     <tr key={property.id} className="hover:bg-gray-50 transition">
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-3">
+                                                {/* IMAGE DISPLAY */}
                                                 <div className="h-12 w-12 rounded-lg bg-gray-100 overflow-hidden flex items-center justify-center border border-gray-200">
-                                                    {getThumbnail(property) ? (
-                                                        <img src={getThumbnail(property)} className="w-full h-full object-cover" alt="Property" />
+                                                    {getImageUrl(property) ? (
+                                                        <img
+                                                            src={getImageUrl(property)}
+                                                            className="w-full h-full object-cover"
+                                                            alt="Property"
+                                                            onError={(e) => {
+                                                                e.target.onerror = null;
+                                                                e.target.src = "https://via.placeholder.com/150?text=No+Img";
+                                                            }}
+                                                        />
                                                     ) : (
                                                         <ImageOff className="w-5 h-5 text-gray-400" />
                                                     )}
