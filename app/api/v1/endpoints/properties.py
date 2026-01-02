@@ -1,38 +1,48 @@
-from typing import List
-import random # <--- Import this for the AI simulation
-from fastapi import APIRouter, Depends, HTTPException, File, UploadFile
+from typing import List, Optional
+import random
+from fastapi import APIRouter, Depends, HTTPException, File, UploadFile, Query
 from sqlalchemy.orm import Session
 from app.db import database, models, schemas
-from pydantic import BaseModel
 
 router = APIRouter()
 
-# --- 1. UPLOAD IMAGE ---
+# --- 1. UPLOAD IMAGE (Returns a working URL) ---
 @router.post("/upload")
 async def upload_image(file: UploadFile = File(...)):
     # Returns a random high-quality house image for the demo
+    # ensuring the URL is absolute (starts with http)
     random_id = random.randint(1, 1000)
     return {"url": f"https://images.unsplash.com/photo-1600596542815-2a4d9fdb88b8?auto=format&fit=crop&w=800&q=80&sig={random_id}"}
 
-# --- 2. GET ALL PROPERTIES ---
+# --- 2. GET PROPERTIES (With "My Listings" Filter) ---
 @router.get("/", response_model=List[schemas.Property])
-def read_properties(skip: int = 0, limit: int = 100, db: Session = Depends(database.get_db)):
-    properties = db.query(models.Property).offset(skip).limit(limit).all()
+def read_properties(
+        skip: int = 0,
+        limit: int = 100,
+        owner_id: Optional[int] = None, # <--- NEW FILTER
+        db: Session = Depends(database.get_db)
+):
+    query = db.query(models.Property)
+
+    # If owner_id is passed (e.g., from Dashboard), only show their properties
+    if owner_id:
+        query = query.filter(models.Property.owner_id == owner_id)
+
+    properties = query.offset(skip).limit(limit).all()
     return properties
 
-# --- 3. CREATE PROPERTY (WITH AI SCORING) ---
+# --- 3. CREATE PROPERTY (Assign to User 1) ---
 @router.post("/", response_model=schemas.Property)
 def create_property(property: schemas.PropertyCreate, db: Session = Depends(database.get_db)):
 
-    # 🤖 AI LOGIC: Calculate Risk Score
-    # In a real app, this would check title deeds.
-    # For the demo, we generate a realistic score between 10 (Safe) and 80 (Risky)
-    ai_risk_score = random.randint(5, 35) # Mostly safe for demo purposes
+    # Generate random Risk Score
+    ai_risk_score = random.randint(5, 35)
 
-    # Create the Property Model
+    # Create Property with owner_id = 1 (Simulating "You")
     db_property = models.Property(
-        **property.dict(exclude={"images"}), # Exclude images for now
-        risk_score=ai_risk_score # <--- Save the score!
+        **property.dict(exclude={"images"}),
+        risk_score=ai_risk_score,
+        owner_id=1  # <--- ASSIGN TO SELLER
     )
 
     db.add(db_property)
@@ -56,18 +66,24 @@ def read_property(property_id: int, db: Session = Depends(database.get_db)):
         raise HTTPException(status_code=404, detail="Property not found")
     return db_property
 
-# --- 5. GENERATE FULL AI REPORT ---
+# --- 5. CONTACT ENDPOINT ---
+class ContactRequest(schemas.BaseModel):
+    name: str
+    email: str
+    phone: str
+    message: str
+
+@router.post("/{property_id}/contact")
+def contact_seller(property_id: int, contact: ContactRequest, db: Session = Depends(database.get_db)):
+    return {"status": "success", "message": "Inquiry sent!"}
+
+# --- 6. REPORT ENDPOINT ---
 @router.get("/{property_id}/report")
 def generate_report(property_id: int, db: Session = Depends(database.get_db)):
-    """
-    Generates a detailed AI Due Diligence Report.
-    """
     db_property = db.query(models.Property).filter(models.Property.id == property_id).first()
     if db_property is None:
         raise HTTPException(status_code=404, detail="Property not found")
 
-    # 🤖 SIMULATE DEEP ANALYSIS DATA
-    # In a real app, this would query the Deeds Office API.
     return {
         "property_id": db_property.id,
         "generated_at": "2025-01-01",
@@ -78,38 +94,10 @@ def generate_report(property_id: int, db: Session = Depends(database.get_db)):
             "price_per_sqm": db_property.price / db_property.land_size if db_property.land_size else 0
         },
         "legal_checks": [
-            {"check": "Title Deed Authenticity", "status": "PASSED", "details": "Deed #4529 matches central registry."},
-            {"check": "Encumbrances / Liens", "status": "PASSED", "details": "No outstanding bank loans found."},
-            {"check": "Seller Identity", "status": "PASSED", "details": "Biometric ID match confirmed."},
-            {"check": "Zoning Regulations", "status": "WARNING", "details": "Property is near a wetland buffer zone."}
+            {"check": "Title Deed Authenticity", "status": "PASSED", "details": "Deed matches registry."},
+            {"check": "Encumbrances", "status": "PASSED", "details": "No outstanding loans."},
+            {"check": "Seller Identity", "status": "PASSED", "details": "Biometric match confirmed."},
+            {"check": "Zoning", "status": "WARNING", "details": "Near buffer zone."}
         ],
-        "history": [
-            {"date": "2023-05-12", "event": "Property Listed for Sale"},
-            {"date": "2018-11-04", "event": "Ownership Transfer (Sold)"},
-            {"date": "2010-02-20", "event": "Initial Registration"}
-        ]
+        "history": []
     }
-
-# --- SIMPLE SCHEMA FOR MESSAGES ---
-class ContactRequest(BaseModel):
-    name: str
-    email: str
-    phone: str
-    message: str
-
-# --- 6. CONTACT SELLER ENDPOINT ---
-@router.post("/{property_id}/contact")
-def contact_seller(property_id: int, contact: ContactRequest, db: Session = Depends(database.get_db)):
-    """
-    Simulates sending an inquiry email to the property owner.
-    """
-    # Check if property exists
-    db_property = db.query(models.Property).filter(models.Property.id == property_id).first()
-    if not db_property:
-        raise HTTPException(status_code=404, detail="Property not found")
-
-    # In a real app, we would trigger an email service like SendGrid here.
-    # For now, we just acknowledge receipt.
-    print(f"📩 NEW LEAD for Property {property_id}: {contact.name} ({contact.email}) says: {contact.message}")
-
-    return {"status": "success", "message": "Inquiry sent successfully! The agent will contact you shortly."}
