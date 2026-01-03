@@ -6,11 +6,11 @@ from app.db import database, models, schemas
 
 router = APIRouter()
 
-# --- 1. UPLOAD IMAGE (Returns a working URL) ---
+# --- 1. UPLOAD IMAGE (Returns a working absolute URL) ---
 @router.post("/upload")
 async def upload_image(file: UploadFile = File(...)):
     # Returns a random high-quality house image for the demo
-    # ensuring the URL is absolute (starts with http)
+    # ensuring the URL is absolute (starts with http) to avoid broken images
     random_id = random.randint(1, 1000)
     return {"url": f"https://images.unsplash.com/photo-1600596542815-2a4d9fdb88b8?auto=format&fit=crop&w=800&q=80&sig={random_id}"}
 
@@ -19,7 +19,7 @@ async def upload_image(file: UploadFile = File(...)):
 def read_properties(
         skip: int = 0,
         limit: int = 100,
-        owner_id: Optional[int] = None, # <--- NEW FILTER
+        owner_id: Optional[int] = None, # <--- NEW FILTER PARAMETER
         db: Session = Depends(database.get_db)
 ):
     query = db.query(models.Property)
@@ -42,7 +42,7 @@ def create_property(property: schemas.PropertyCreate, db: Session = Depends(data
     db_property = models.Property(
         **property.dict(exclude={"images"}),
         risk_score=ai_risk_score,
-        owner_id=1  # <--- ASSIGN TO SELLER
+        owner_id=1  # <--- ASSIGN TO SELLER (YOU)
     )
 
     db.add(db_property)
@@ -86,18 +86,10 @@ def generate_report(property_id: int, db: Session = Depends(database.get_db)):
 
     return {
         "property_id": db_property.id,
-        "generated_at": "2025-01-01",
         "risk_score": db_property.risk_score,
-        "valuation": {
-            "estimated_value": db_property.price * 0.95,
-            "market_trend": "Rising (+5% this year)",
-            "price_per_sqm": db_property.price / db_property.land_size if db_property.land_size else 0
-        },
+        "valuation": {"estimated_value": db_property.price * 0.95, "market_trend": "Rising"},
         "legal_checks": [
-            {"check": "Title Deed Authenticity", "status": "PASSED", "details": "Deed matches registry."},
-            {"check": "Encumbrances", "status": "PASSED", "details": "No outstanding loans."},
-            {"check": "Seller Identity", "status": "PASSED", "details": "Biometric match confirmed."},
-            {"check": "Zoning", "status": "WARNING", "details": "Near buffer zone."}
-        ],
-        "history": []
+            {"check": "Title Deed", "status": "PASSED", "details": "Verified."},
+            {"check": "Encumbrances", "status": "PASSED", "details": "Clean."}
+        ]
     }

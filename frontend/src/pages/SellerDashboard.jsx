@@ -35,7 +35,7 @@ const SellerDashboard = () => {
     const handleDelete = async (id) => {
         if(!window.confirm("Are you sure you want to delete this listing?")) return;
         try {
-            // Logic to delete from array visually for demo
+            // In a real app: await axios.delete(`${API_URL}/api/v1/properties/${id}`);
             setProperties(properties.filter(p => p.id !== id));
         } catch (err) {
             alert("Failed to delete.");
@@ -43,23 +43,15 @@ const SellerDashboard = () => {
     };
 
     // ✅ ROBUST IMAGE FIXER
+    // This function handles absolute URLs (Unsplash) and relative URLs (local uploads)
     const getImageUrl = (property) => {
-        // 1. Check if images exist
         if (!property.images || property.images.length === 0) return null;
 
-        // 2. Get the first image URL
         const rawUrl = property.images[0].image_url;
-
-        // 3. If it's empty, return null
         if (!rawUrl) return null;
 
-        // 4. If it starts with 'http', it's a full link (Unsplash). Return as is.
-        if (rawUrl.startsWith('http')) {
-            return rawUrl;
-        }
-
-        // 5. Otherwise, it's a local path. Append API_URL.
-        return `${API_URL}${rawUrl}`;
+        // If it starts with http, it's a web link. If not, append our API URL.
+        return rawUrl.startsWith('http') ? rawUrl : `${API_URL}${rawUrl}`;
     };
 
     if (loading) return (
@@ -125,6 +117,7 @@ const SellerDashboard = () => {
                                                             alt="Property"
                                                             onError={(e) => {
                                                                 e.target.onerror = null;
+                                                                // Fallback if image fails to load
                                                                 e.target.src = "https://via.placeholder.com/150?text=No+Img";
                                                             }}
                                                         />
