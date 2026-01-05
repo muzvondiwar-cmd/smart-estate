@@ -1,16 +1,13 @@
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, declarative_base
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
 
-# --- FORCE SQLITE DATABASE ---
-# We are hardcoding this so the server HAS to use the file.
-SQLALCHEMY_DATABASE_URL = "sqlite:///./smart_estate.db"
+# ✅ CHANGED FILENAME TO FORCE RESET
+SQLALCHEMY_DATABASE_URL = "sqlite:///./smartestate_v2.db"
 
-# connect_args={"check_same_thread": False} is REQUIRED for SQLite
 engine = create_engine(
-    SQLALCHEMY_DATABASE_URL,
-    connect_args={"check_same_thread": False}
+    SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
 )
-
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()

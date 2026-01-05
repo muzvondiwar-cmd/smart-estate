@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from typing import List, Optional
 
-# --- 1. USER SCHEMAS (This was missing!) ---
+# --- 1. USER SCHEMAS ---
 class UserBase(BaseModel):
     email: str
     full_name: Optional[str] = None
@@ -11,8 +11,7 @@ class UserCreate(UserBase):
 
 class User(UserBase):
     id: int
-    role: str = "user"
-
+    role: str = "agent"  # Default role
     class Config:
         from_attributes = True
 
@@ -39,19 +38,15 @@ class PropertyImage(BaseModel):
     class Config:
         from_attributes = True
 
-# --- 3. RESPONSE SCHEMA ---
 class Property(PropertyBase):
     id: int
     owner_id: Optional[int] = None
     images: List[PropertyImage] = []
-
-    # AI FIELDS
     risk_score: int = 0
-
     class Config:
         from_attributes = True
 
-# --- 4. CONTACT SCHEMA ---
+# --- 3. EXTRAS ---
 class ContactRequest(BaseModel):
     name: str
     email: str
