@@ -1,196 +1,235 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import { Search, MapPin, BedDouble, Bath, Square, Home as HomeIcon, AlertTriangle } from 'lucide-react';
-import { API_URL } from '../config'; // <--- IMPORTANT: Reads your config file
+import { Search, MapPin, BedDouble, Bath, Square, ArrowRight, ShieldCheck, Zap, Lock } from 'lucide-react';
+import { API_URL } from '../config';
+
+// --- 🏡 HIGH-QUALITY DUMMY DATA ---
+const DUMMY_PROPERTIES = [
+    {
+        id: 'dummy-1',
+        title: 'Modern Villa in Borrowdale Brooke',
+        price: 450000,
+        location: 'Borrowdale Brooke, Harare',
+        bedrooms: 5,
+        bathrooms: 4,
+        land_size: 2000,
+        risk_score: 12, // Safe
+        image_url: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=800&q=80',
+        listing_status: 'For Sale'
+    },
+    {
+        id: 'dummy-2',
+        title: 'Luxury Apartment in Avondale',
+        price: 120000,
+        location: 'Avondale, Harare',
+        bedrooms: 2,
+        bathrooms: 2,
+        land_size: 150,
+        risk_score: 8, // Very Safe
+        image_url: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=800&q=80',
+        listing_status: 'For Sale'
+    },
+    {
+        id: 'dummy-3',
+        title: 'Family Home in Bulawayo',
+        price: 85000,
+        location: 'Hillside, Bulawayo',
+        bedrooms: 4,
+        bathrooms: 2,
+        land_size: 1200,
+        risk_score: 45, // Moderate Risk (Educational)
+        image_url: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=800&q=80',
+        listing_status: 'For Sale'
+    },
+    {
+        id: 'dummy-4',
+        title: 'Sunset Penthouse',
+        price: 280000,
+        location: 'Newlands, Harare',
+        bedrooms: 3,
+        bathrooms: 3,
+        land_size: 300,
+        risk_score: 5, // Extremely Safe
+        image_url: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80',
+        listing_status: 'For Sale'
+    }
+];
 
 const Home = () => {
-  const [properties, setProperties] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
+    const [properties, setProperties] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [searchTerm, setSearchTerm] = useState('');
 
-  // Fetch properties from the Backend
-  useEffect(() => {
-    const fetchProperties = async () => {
-      try {
-        console.log("Fetching from:", `${API_URL}/api/v1/properties`); // Debug log
-        const response = await axios.get(`${API_URL}/api/v1/properties`);
-        setProperties(response.data);
-        setLoading(false);
-      } catch (err) {
-        console.error("Error fetching properties:", err);
-        setError('Failed to load properties. Please check your connection.');
-        setLoading(false);
-      }
-    };
+    useEffect(() => {
+        const fetchProperties = async () => {
+            try {
+                // Try to fetch real data
+                const response = await axios.get(`${API_URL}/api/v1/properties/`);
 
-    fetchProperties();
-  }, []);
+                // Combine Real Data + Dummy Data
+                // (We map over real data to ensure image URLs are correct)
+                const realProperties = response.data.map(p => ({
+                    ...p,
+                    image_url: p.images && p.images.length > 0
+                        ? (p.images[0].image_url.startsWith('http') ? p.images[0].image_url : `${API_URL}${p.images[0].image_url}`)
+                        : 'https://via.placeholder.com/800x600?text=No+Image'
+                }));
 
-  // Filter properties based on search
-  const filteredProperties = properties.filter((property) =>
-    property.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    property.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    property.suburb.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+                setProperties([...realProperties, ...DUMMY_PROPERTIES]);
+            } catch (err) {
+                console.warn("Backend offline or empty, showing dummy data only.");
+                setProperties(DUMMY_PROPERTIES);
+            } finally {
+                setLoading(false);
+            }
+        };
 
-  if (loading) return (
-    <div className="flex justify-center items-center h-screen">
-      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-    </div>
-  );
+        fetchProperties();
+    }, []);
 
-  return (
-    <div className="min-h-screen bg-gray-50 pb-12">
+    // Filter Logic
+    const filteredProperties = properties.filter(p =>
+        p.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        p.location.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
-      {/* --- HERO SECTION --- */}
-      <div className="bg-white border-b border-gray-200 pt-16 pb-12 px-4 mb-8">
-        <div className="max-w-7xl mx-auto text-center space-y-4">
+    return (
+        <div className="min-h-screen bg-gray-50">
 
-          {/* Trust Badge */}
-          <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest mb-4">
-            <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
-            AI-Verified Real Estate
-          </div>
+            {/* --- 1. HERO SECTION --- */}
+            <div className="relative bg-blue-900 h-[500px] flex items-center justify-center text-center px-4 overflow-hidden">
+                {/* Abstract Background Elements */}
+                <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=1920&q=80')] bg-cover bg-center opacity-20"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-blue-900 to-transparent"></div>
 
-          {/* Main Title */}
-          <h1 className="text-4xl md:text-6xl font-extrabold text-slate-900 tracking-tight leading-tight">
-            Invest with <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-700 to-blue-500">Confidence.</span>
-          </h1>
+                <div className="relative z-10 max-w-3xl mx-auto space-y-6">
+          <span className="bg-blue-500/20 text-blue-200 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-widest border border-blue-400/30">
+            Zimbabwe's First AI Real Estate Platform
+          </span>
+                    <h1 className="text-4xl md:text-6xl font-black text-white tracking-tight leading-tight">
+                        Find Your Dream Home, <br/>
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400">Without the Risk.</span>
+                    </h1>
+                    <p className="text-lg text-blue-100 max-w-2xl mx-auto">
+                        SmartEstate AI analyzes market data and title deeds to verify every listing, giving you a safety score before you view.
+                    </p>
 
-          {/* Subtitle */}
-          <p className="text-lg text-slate-500 max-w-2xl mx-auto leading-relaxed">
-            The first marketplace in Zimbabwe that uses Artificial Intelligence to
-            detect fraud, verify title deeds, and score investment risk in real-time.
-          </p>
-
-          {/* Search Bar */}
-          <div className="max-w-xl mx-auto mt-8 relative">
-            <input
-              type="text"
-              placeholder="Search by suburb, city, or property type..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-12 pr-4 py-4 rounded-full border border-gray-200 shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
-            />
-            <Search className="absolute left-4 top-4 text-gray-400 w-5 h-5" />
-          </div>
-        </div>
-      </div>
-
-      {/* --- LISTINGS GRID --- */}
-      <div className="max-w-7xl mx-auto px-4">
-
-        {error && (
-          <div className="bg-red-50 text-red-600 p-4 rounded-lg mb-6 flex items-center gap-2">
-            <AlertTriangle className="w-5 h-5" />
-            {error}
-          </div>
-        )}
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredProperties.map((property) => (
-            <div key={property.id} className="group bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full">
-
-              {/* Image Area */}
-              <div className="h-56 bg-gray-100 relative overflow-hidden">
-                 {/* Try to show first image, else fallback */}
-                 {property.images && property.images.length > 0 ? (
-                    <img
-                      src={`${API_URL}${property.images[0].image_url}`}
-                      alt={property.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition duration-700"
-                      onError={(e) => {
-                        e.target.src = "https://via.placeholder.com/400x300?text=No+Image"; // Fallback if link breaks
-                      }}
-                    />
-                 ) : (
-                    <div className="w-full h-full flex flex-col items-center justify-center text-gray-300 bg-gray-50">
-                      <HomeIcon className="w-10 h-10 mb-2 opacity-30" />
-                      <span className="text-xs font-medium uppercase tracking-widest">No Photos</span>
+                    {/* Search Bar */}
+                    <div className="bg-white p-2 rounded-full shadow-2xl max-w-xl mx-auto flex items-center transform translate-y-4">
+                        <div className="pl-4 text-gray-400"><Search className="w-5 h-5"/></div>
+                        <input
+                            type="text"
+                            placeholder="Search by city, suburb, or price..."
+                            className="flex-grow p-3 outline-none text-gray-700 font-medium placeholder-gray-400 bg-transparent"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                        <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-full font-bold transition">
+                            Search
+                        </button>
                     </div>
-                 )}
-
-                 {/* Status Tag */}
-                 <div className="absolute top-3 left-3">
-                    <span className="bg-white/95 backdrop-blur-sm px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider text-gray-800 shadow-sm border border-gray-100">
-                       {property.listing_status}
-                    </span>
-                 </div>
-
-                 {/* Risk Badge */}
-                 <div className={`absolute top-3 right-3 px-2 py-1 rounded flex items-center gap-1 shadow-sm border ${
-                      property.risk_score < 20 ? 'bg-emerald-50 border-emerald-100 text-emerald-700' :
-                      property.risk_score < 50 ? 'bg-yellow-50 border-yellow-100 text-yellow-700' :
-                      'bg-rose-50 border-rose-100 text-rose-700'
-                   }`}>
-                     <div className={`w-1.5 h-1.5 rounded-full ${
-                        property.risk_score < 20 ? 'bg-emerald-500' : property.risk_score < 50 ? 'bg-yellow-500' : 'bg-rose-500'
-                     }`}></div>
-                     <span className="text-[10px] font-bold uppercase tracking-wide">Risk: {property.risk_score}</span>
-                 </div>
-              </div>
-
-              {/* Details Area */}
-              <div className="p-5 flex flex-col flex-grow">
-                <div className="mb-4">
-                   <h3 className="font-semibold text-gray-900 text-lg leading-tight line-clamp-1 group-hover:text-blue-600 transition-colors">
-                     {property.title}
-                   </h3>
-                   <p className="text-2xl font-bold text-gray-900 tracking-tight mt-1">
-                     ${property.price.toLocaleString()}
-                   </p>
-                   <div className="flex items-center text-gray-500 text-sm mt-1">
-                      <MapPin className="w-3.5 h-3.5 mr-1" />
-                      <span className="truncate">{property.suburb}, {property.city}</span>
-                   </div>
                 </div>
-
-                {/* Specs */}
-                <div className="grid grid-cols-3 gap-3 py-4 border-t border-gray-100 mt-auto">
-                  <div className="flex flex-col items-start">
-                      <div className="flex items-center gap-1 text-gray-400 mb-0.5">
-                         <BedDouble className="w-4 h-4" />
-                         <span className="text-xs font-medium uppercase">Beds</span>
-                      </div>
-                      <span className="text-sm font-semibold text-gray-700">{property.bedrooms}</span>
-                  </div>
-                  <div className="flex flex-col items-start border-l border-gray-100 pl-3">
-                      <div className="flex items-center gap-1 text-gray-400 mb-0.5">
-                         <Bath className="w-4 h-4" />
-                         <span className="text-xs font-medium uppercase">Baths</span>
-                      </div>
-                      <span className="text-sm font-semibold text-gray-700">{property.bathrooms}</span>
-                  </div>
-                  <div className="flex flex-col items-start border-l border-gray-100 pl-3">
-                      <div className="flex items-center gap-1 text-gray-400 mb-0.5">
-                         <Square className="w-4 h-4" />
-                         <span className="text-xs font-medium uppercase">Area</span>
-                      </div>
-                      <span className="text-sm font-semibold text-gray-700">{property.land_size}m²</span>
-                  </div>
-                </div>
-
-                {/* Button */}
-                <Link to={`/property/${property.id}`} className="mt-4 w-full block text-center bg-gray-900 hover:bg-blue-600 text-white font-medium py-2.5 rounded-lg transition-all duration-300 text-sm">
-                    View Analysis
-                </Link>
-              </div>
             </div>
-          ))}
+
+            {/* --- 2. FEATURES STRIP --- */}
+            <div className="bg-white border-b border-gray-200">
+                <div className="max-w-7xl mx-auto py-12 px-4 grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div className="flex items-start gap-4">
+                        <div className="p-3 bg-blue-50 rounded-lg text-blue-600"><ShieldCheck className="w-8 h-8"/></div>
+                        <div>
+                            <h3 className="font-bold text-gray-900 text-lg">AI Due Diligence</h3>
+                            <p className="text-sm text-gray-500 mt-1">Every property gets an automated risk score based on price and legal data.</p>
+                        </div>
+                    </div>
+                    <div className="flex items-start gap-4">
+                        <div className="p-3 bg-emerald-50 rounded-lg text-emerald-600"><Zap className="w-8 h-8"/></div>
+                        <div>
+                            <h3 className="font-bold text-gray-900 text-lg">Instant Verification</h3>
+                            <p className="text-sm text-gray-500 mt-1">No more waiting. Get preliminary title deed checks in seconds, not weeks.</p>
+                        </div>
+                    </div>
+                    <div className="flex items-start gap-4">
+                        <div className="p-3 bg-purple-50 rounded-lg text-purple-600"><Lock className="w-8 h-8"/></div>
+                        <div>
+                            <h3 className="font-bold text-gray-900 text-lg">Secure & Transparent</h3>
+                            <p className="text-sm text-gray-500 mt-1">We verify agent identities to prevent fraud and double-selling scams.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* --- 3. PROPERTY LISTINGS --- */}
+            <div className="max-w-7xl mx-auto py-16 px-4">
+                <div className="flex justify-between items-end mb-8">
+                    <div>
+                        <h2 className="text-3xl font-bold text-gray-900">Featured Listings</h2>
+                        <p className="text-gray-500 mt-2">Explore verified properties with low risk scores.</p>
+                    </div>
+                    <button className="hidden md:flex items-center gap-2 text-blue-600 font-bold hover:underline">
+                        View All <ArrowRight className="w-4 h-4"/>
+                    </button>
+                </div>
+
+                {loading ? (
+                    <div className="flex justify-center py-20">
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-900"></div>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                        {filteredProperties.map((property) => (
+                            <Link to={`/property/${property.id}`} key={property.id} className="group bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition duration-300">
+
+                                {/* Image Area */}
+                                <div className="relative h-48 overflow-hidden">
+                                    <img
+                                        src={property.image_url}
+                                        alt={property.title}
+                                        className="w-full h-full object-cover transition duration-500 group-hover:scale-110"
+                                    />
+                                    {/* Risk Badge */}
+                                    <div className={`absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-bold shadow-sm ${
+                                        property.risk_score < 20 ? 'bg-emerald-500 text-white' :
+                                            property.risk_score < 50 ? 'bg-yellow-500 text-white' : 'bg-red-500 text-white'
+                                    }`}>
+                                        Risk: {property.risk_score}/100
+                                    </div>
+
+                                    <div className="absolute bottom-3 left-3 bg-black/60 backdrop-blur-sm text-white px-3 py-1 rounded text-xs font-bold uppercase tracking-wider">
+                                        {property.listing_status}
+                                    </div>
+                                </div>
+
+                                {/* Content Area */}
+                                <div className="p-5">
+                                    <div className="flex justify-between items-start mb-2">
+                                        <h3 className="font-bold text-gray-900 text-lg line-clamp-1">{property.title}</h3>
+                                    </div>
+
+                                    <div className="flex items-center text-gray-500 text-sm mb-4">
+                                        <MapPin className="w-4 h-4 mr-1 text-gray-400" />
+                                        {property.location}
+                                    </div>
+
+                                    <div className="flex items-center justify-between text-gray-500 text-xs py-3 border-t border-gray-100">
+                                        <div className="flex items-center gap-1"><BedDouble className="w-4 h-4"/> {property.bedrooms} Beds</div>
+                                        <div className="flex items-center gap-1"><Bath className="w-4 h-4"/> {property.bathrooms} Baths</div>
+                                        <div className="flex items-center gap-1"><Square className="w-4 h-4"/> {property.land_size}m²</div>
+                                    </div>
+
+                                    <div className="mt-4 flex items-center justify-between">
+                    <span className="text-xl font-black text-blue-900">
+                      ${property.price.toLocaleString()}
+                    </span>
+                                    </div>
+                                </div>
+                            </Link>
+                        ))}
+                    </div>
+                )}
+            </div>
         </div>
-
-        {/* Empty State */}
-        {!loading && filteredProperties.length === 0 && (
-          <div className="text-center py-20">
-            <p className="text-gray-400 text-lg">No properties found matching "{searchTerm}"</p>
-          </div>
-        )}
-
-      </div>
-    </div>
-  );
+    );
 };
 
 export default Home;
