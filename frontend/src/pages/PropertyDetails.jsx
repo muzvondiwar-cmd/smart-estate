@@ -70,7 +70,6 @@ const DUMMY_PROPERTIES = [
         listing_status: 'For Sale',
         owner: { full_name: "Grace Chiwenga", email: "grace.c@example.com" }
     },
-    // Add these to the DUMMY_PROPERTIES array in PropertyDetails.jsx
 
     {
         id: 'dummy-6',

@@ -67,7 +67,6 @@ const DUMMY_REPORTS = {
         ],
         ai_summary: "CAUTION ADVISED: While the seller is verified, there is a historical caveat and a boundary dispute that must be resolved before purchase. We recommend a full physical survey and legal consultation."
     },
-    // Add to DUMMY_REPORTS object in Report.jsx
 
     'dummy-6': {
         generated_at: new Date().toISOString().split('T')[0],

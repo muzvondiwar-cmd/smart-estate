@@ -54,7 +54,6 @@ const DUMMY_PROPERTIES = [
         image_url: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80',
         listing_status: 'For Sale'
     },
-    // Add these to the existing DUMMY_PROPERTIES array:
 
     {
         id: 'dummy-6',
