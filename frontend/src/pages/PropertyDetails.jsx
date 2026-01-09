@@ -69,6 +69,40 @@ const DUMMY_PROPERTIES = [
         image_url: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1200&q=80',
         listing_status: 'For Sale',
         owner: { full_name: "Grace Chiwenga", email: "grace.c@example.com" }
+    },
+    // Add these to the DUMMY_PROPERTIES array in PropertyDetails.jsx
+
+    {
+        id: 'dummy-6',
+        title: 'Extended Core House in Budiriro',
+        description: "A neat 4-roomed core house in Budiriro 5. Fully walled and gated. There is ample space for further extensions. The property is currently under Council Cession, ready for title surveys. Great starter home.",
+        price: 35000,
+        location: 'Budiriro 5, Harare',
+        city: 'Harare',
+        suburb: 'Budiriro',
+        bedrooms: 4,
+        bathrooms: 1,
+        land_size: 300,
+        risk_score: 42,
+        image_url: 'https://images.unsplash.com/photo-1628624747186-a941c476b7ef?auto=format&fit=crop&w=1200&q=80',
+        listing_status: 'For Sale',
+        owner: { full_name: "Mr. Phiri", email: "phiri.invest@example.com" }
+    },
+    {
+        id: 'dummy-7',
+        title: 'Investment Property in Highfield',
+        description: "High-yield investment opportunity in Western Triangle. Main house features 4 bedrooms, plus a separate 3-roomed cottage currently tenanted. Close to Gwanzura Stadium and transport hubs. Needs some cosmetic renovations.",
+        price: 45000,
+        location: 'Western Triangle, Highfield',
+        city: 'Harare',
+        suburb: 'Highfield',
+        bedrooms: 7,
+        bathrooms: 2,
+        land_size: 200,
+        risk_score: 65,
+        image_url: 'https://images.unsplash.com/photo-1599809275671-b5942cabc7ad?auto=format&fit=crop&w=1200&q=80',
+        listing_status: 'For Sale',
+        owner: { full_name: "Mai Tawanda", email: "mait@example.com" }
     }
 ];
 

@@ -66,6 +66,48 @@ const DUMMY_REPORTS = {
             { year: 2010, price: 75000, event: "Inheritance Transfer" }
         ],
         ai_summary: "CAUTION ADVISED: While the seller is verified, there is a historical caveat and a boundary dispute that must be resolved before purchase. We recommend a full physical survey and legal consultation."
+    },
+    // Add to DUMMY_REPORTS object in Report.jsx
+
+    'dummy-6': {
+        generated_at: new Date().toISOString().split('T')[0],
+        risk_score: 42,
+        valuation: {
+            estimated_value: 34000,
+            market_trend: "Rising (+5% this year)",
+            price_per_sqm: 116,
+            confidence: "High (90%)"
+        },
+        legal_checks: [
+            { check: "Ownership Status", status: "WARNING", details: "Property is on Council Cession (No Title Deed yet). Transfer requires Council approval." },
+            { check: "Utility Bills", status: "PASSED", details: "City of Harare rates are up to date." },
+            { check: "Seller Identity", status: "PASSED", details: "Seller ID matches Cession papers." },
+            { check: "Soil Conditions", status: "WARNING", details: "Area known for black cotton soil; special foundation checks recommended." }
+        ],
+        history: [
+            { year: 2018, price: 28000, event: "Cession Transfer" }
+        ],
+        ai_summary: "A fair value property, but the buyer must understand the Cession transfer process. The risk score is elevated solely due to the lack of a full Title Deed, which is common in this area. Ensure the Council transfer fees are factored into your budget."
+    },
+    'dummy-7': {
+        generated_at: new Date().toISOString().split('T')[0],
+        risk_score: 65,
+        valuation: {
+            estimated_value: 42000,
+            market_trend: "Stable",
+            price_per_sqm: 225,
+            confidence: "Moderate (80%)"
+        },
+        legal_checks: [
+            { check: "Title Deed", status: "CRITICAL", details: "Title is currently in a Deceased Estate name. Executor consent required." },
+            { check: "Building Plans", status: "WARNING", details: "Cottage extension does not appear on approved municipal plans." },
+            { check: "Encumbrances", status: "PASSED", details: "No caveats found." },
+            { check: "Tenancy", status: "WARNING", details: "Existing tenants have no written lease agreement." }
+        ],
+        history: [
+            { year: 1995, price: 15000, event: "Original Purchase" }
+        ],
+        ai_summary: "HIGH RISK: This property is part of a Deceased Estate. Do NOT pay any deposit until the Executor has signed the Sale Agreement and the Master of High Court has issued consent. The unapproved cottage may also attract penalties from the City Council."
     }
 };
 

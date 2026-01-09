@@ -53,6 +53,32 @@ const DUMMY_PROPERTIES = [
         risk_score: 5, // Extremely Safe
         image_url: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80',
         listing_status: 'For Sale'
+    },
+    // Add these to the existing DUMMY_PROPERTIES array:
+
+    {
+        id: 'dummy-6',
+        title: 'Extended Core House in Budiriro',
+        price: 35000,
+        location: 'Budiriro 5, Harare',
+        bedrooms: 4,
+        bathrooms: 1,
+        land_size: 300,
+        risk_score: 42, // Moderate Risk (Cession issues)
+        image_url: 'https://images.unsplash.com/photo-1628624747186-a941c476b7ef?auto=format&fit=crop&w=800&q=80',
+        listing_status: 'For Sale'
+    },
+    {
+        id: 'dummy-7',
+        title: 'Investment Property in Highfield',
+        price: 45000,
+        location: 'Western Triangle, Highfield',
+        bedrooms: 7,
+        bathrooms: 2, // Main house + cottage
+        land_size: 200,
+        risk_score: 65, // High Risk (Deceased Estate / Old Title)
+        image_url: 'https://images.unsplash.com/photo-1599809275671-b5942cabc7ad?auto=format&fit=crop&w=800&q=80',
+        listing_status: 'For Sale'
     }
 ];
 
