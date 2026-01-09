@@ -1,137 +1,249 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
-import { ShieldCheck, Printer, ArrowLeft, CheckCircle, AlertTriangle } from 'lucide-react';
+import { ShieldCheck, AlertTriangle, CheckCircle, Download, ArrowLeft, Printer, FileText, TrendingUp, DollarSign, Activity } from 'lucide-react';
 import { API_URL } from '../config';
+
+// --- 📄 PRE-GENERATED DUMMY REPORTS ---
+const DUMMY_REPORTS = {
+    'dummy-1': {
+        generated_at: new Date().toISOString().split('T')[0],
+        risk_score: 12,
+        valuation: {
+            estimated_value: 465000,
+            market_trend: "Rising (+8% this year)",
+            price_per_sqm: 225,
+            confidence: "High (95%)"
+        },
+        legal_checks: [
+            { check: "Title Deed Authenticity", status: "PASSED", details: "Deed #452/2019 matches Deeds Registry records." },
+            { check: "Encumbrances / Liens", status: "PASSED", details: "No outstanding mortgages or caveats found." },
+            { check: "Seller Identity", status: "PASSED", details: "Biometric match verified against National ID database." },
+            { check: "Zoning Regulations", status: "PASSED", details: "Property is correctly zoned for Residential use." },
+            { check: "Municipal Rates", status: "WARNING", details: "Minor outstanding balance of $120 detected (Current)." }
+        ],
+        history: [
+            { year: 2023, price: 420000, event: "Market Valuation" },
+            { year: 2019, price: 380000, event: "Last Sold" },
+            { year: 2015, price: 350000, event: "Sold" }
+        ],
+        ai_summary: "This property represents a highly secure investment. The title deeds are clean, and the seller has been fully verified. The price is slightly below the suburb average, presenting a good buying opportunity. The minor municipal debt is negligible and easily resolvable."
+    },
+    'dummy-2': {
+        generated_at: new Date().toISOString().split('T')[0],
+        risk_score: 8,
+        valuation: {
+            estimated_value: 125000,
+            market_trend: "Stable (+2% this year)",
+            price_per_sqm: 800,
+            confidence: "Very High (98%)"
+        },
+        legal_checks: [
+            { check: "Title Deed Authenticity", status: "PASSED", details: "Sectional Title Deed verified." },
+            { check: "Encumbrances", status: "PASSED", details: "Clear." },
+            { check: "Seller Identity", status: "PASSED", details: "Verified." },
+            { check: "Levies", status: "PASSED", details: "Body Corporate levies are up to date." }
+        ],
+        history: [],
+        ai_summary: "A pristine sectional title unit. No legal risks detected. Ideal for rental income or first-time buyers."
+    },
+    'dummy-3': {
+        generated_at: new Date().toISOString().split('T')[0],
+        risk_score: 45,
+        valuation: {
+            estimated_value: 80000,
+            market_trend: "Flat (0% this year)",
+            price_per_sqm: 66,
+            confidence: "Moderate (75%)"
+        },
+        legal_checks: [
+            { check: "Title Deed Authenticity", status: "PASSED", details: "Deed exists but is an older paper copy (pre-digitization)." },
+            { check: "Encumbrances", status: "WARNING", details: "Caveat found from 2018 (Status unclear)." },
+            { check: "Seller Identity", status: "PASSED", details: "Verified." },
+            { check: "Boundaries", status: "CRITICAL", details: "Potential boundary dispute with neighbor recorded in 2020." }
+        ],
+        history: [
+            { year: 2010, price: 75000, event: "Inheritance Transfer" }
+        ],
+        ai_summary: "CAUTION ADVISED: While the seller is verified, there is a historical caveat and a boundary dispute that must be resolved before purchase. We recommend a full physical survey and legal consultation."
+    }
+};
 
 const Report = () => {
     const { id } = useParams();
-    const [report, setReport] = useState(null);
+    const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
         const fetchReport = async () => {
+            // 1. SIMULATE AI PROCESSING DELAY (Makes it feel real)
+            await new Promise(resolve => setTimeout(resolve, 1500));
+
+            // 2. CHECK FOR DUMMY ID
+            if (DUMMY_REPORTS[id]) {
+                setData({ ...DUMMY_REPORTS[id], property_id: id });
+                setLoading(false);
+                return;
+            }
+
+            // 3. FETCH REAL DATA
             try {
                 const response = await axios.get(`${API_URL}/api/v1/properties/${id}/report`);
-                setReport(response.data);
-                setLoading(false);
+                setData(response.data);
             } catch (err) {
-                console.error("Error fetching report:", err);
+                console.error("Report Error:", err);
+                setError("Could not generate report. Please try again later.");
+            } finally {
                 setLoading(false);
             }
         };
+
         fetchReport();
     }, [id]);
 
     if (loading) return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
-            <div className="text-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-900 mx-auto mb-4"></div>
-                <p className="text-gray-600 font-medium">Generating Legal Analysis...</p>
-            </div>
+        <div className="flex flex-col justify-center items-center h-screen bg-gray-50">
+            <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600 mb-6"></div>
+            <h2 className="text-xl font-bold text-gray-800 animate-pulse">Generating Due Diligence Report...</h2>
+            <p className="text-gray-500 mt-2">Analyzing Title Deeds • Checking Court Records • Valuing Market Data</p>
         </div>
     );
 
-    if (!report) return (
-        <div className="min-h-screen flex items-center justify-center text-red-600 font-medium">
-            Failed to generate report. Please try again.
+    if (error) return (
+        <div className="min-h-screen flex items-center justify-center">
+            <div className="text-center">
+                <AlertTriangle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">Analysis Failed</h2>
+                <p className="text-gray-600 mb-6">{error}</p>
+                <Link to={`/property/${id}`} className="text-blue-600 hover:underline font-bold">Return to Property</Link>
+            </div>
         </div>
     );
 
     return (
-        <div className="min-h-screen bg-gray-100 py-8 px-4 font-sans">
-            {/* Navigation */}
-            <div className="max-w-4xl mx-auto mb-6 flex justify-between items-center print:hidden">
-                <Link to={`/property/${id}`} className="flex items-center text-gray-600 hover:text-black transition">
-                    <ArrowLeft className="w-4 h-4 mr-2" /> Back to Property
+        <div className="min-h-screen bg-gray-100 py-12 px-4 print:bg-white print:p-0">
+
+            {/* --- FLOATING HEADER (Hidden on Print) --- */}
+            <div className="max-w-4xl mx-auto mb-8 flex justify-between items-center print:hidden">
+                <Link to={`/property/${id}`} className="flex items-center text-gray-600 hover:text-blue-600 font-bold transition">
+                    <ArrowLeft className="w-5 h-5 mr-2" /> Back to Listing
                 </Link>
-                <button onClick={() => window.print()} className="flex items-center gap-2 bg-blue-900 text-white px-5 py-2 rounded-lg shadow hover:bg-blue-800 transition font-medium">
-                    <Printer className="w-4 h-4" /> Print / Save PDF
+                <button onClick={() => window.print()} className="bg-blue-900 text-white px-6 py-2 rounded-lg font-bold flex items-center gap-2 hover:bg-blue-800 transition shadow-lg">
+                    <Printer className="w-4 h-4" /> Print PDF
                 </button>
             </div>
 
-            {/* --- THE OFFICIAL REPORT DOCUMENT --- */}
-            <div className="max-w-4xl mx-auto bg-white p-8 md:p-16 shadow-xl rounded-xl border border-gray-200 print:shadow-none print:border-none">
+            {/* --- REPORT DOCUMENT PAGE --- */}
+            <div className="max-w-4xl mx-auto bg-white shadow-2xl rounded-xl overflow-hidden print:shadow-none print:w-full">
 
-                {/* Header */}
-                <div className="border-b-4 border-gray-900 pb-8 mb-10 flex justify-between items-start">
-                    <div>
-                        <h1 className="text-4xl font-black text-gray-900 uppercase tracking-tight">Due Diligence Report</h1>
-                        <p className="text-gray-500 mt-2 font-medium tracking-wide">SmartEstate AI Verification Engine</p>
-                    </div>
-                    <div className="text-right">
-                        <div className="text-xs text-gray-400 uppercase tracking-wider font-bold">Reference ID</div>
-                        <div className="font-mono font-bold text-xl text-gray-900">SE-{report.property_id}-2025</div>
-                    </div>
-                </div>
-
-                {/* Risk Score Section */}
-                <div className="bg-slate-50 p-8 rounded-xl border border-slate-200 mb-10 flex items-center justify-between">
-                    <div>
-                        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Overall Risk Score</h3>
-                        <div className="flex items-baseline gap-2">
-                            <span className="text-5xl font-black text-slate-900">{report.risk_score}</span>
-                            <span className="text-xl text-gray-400 font-medium">/100</span>
-                        </div>
-                        <div className={`text-sm font-bold mt-2 uppercase tracking-wide px-2 py-1 rounded inline-block ${report.risk_score < 30 ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'}`}>
-                            {report.risk_score < 30 ? '✅ Low Risk Investment' : '⚠️ Moderate Risk Detected'}
-                        </div>
-                    </div>
-                    <ShieldCheck className={`w-20 h-20 ${report.risk_score < 30 ? 'text-green-200' : 'text-orange-200'}`} />
-                </div>
-
-                {/* Legal Checks Grid */}
-                <div className="mb-10">
-                    <h3 className="text-lg font-bold text-gray-900 mb-6 border-l-4 border-blue-600 pl-4 uppercase tracking-wider">1. Legal & Regulatory Checks</h3>
-                    <div className="grid gap-4">
-                        {report.legal_checks.map((item, index) => (
-                            <div key={index} className="flex items-start justify-between p-5 bg-white border border-gray-100 rounded-lg shadow-sm">
-                                <div className="flex items-start gap-4">
-                                    {item.status === 'PASSED' ?
-                                        <CheckCircle className="w-5 h-5 text-emerald-500 mt-0.5" /> :
-                                        <AlertTriangle className="w-5 h-5 text-amber-500 mt-0.5" />
-                                    }
-                                    <div>
-                                        <div className="font-bold text-gray-900 text-sm">{item.check}</div>
-                                        <div className="text-sm text-gray-500 mt-0.5">{item.details}</div>
-                                    </div>
-                                </div>
-                                <span className={`px-3 py-1 rounded text-[10px] font-bold uppercase tracking-wider ${item.status === 'PASSED' ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' : 'bg-amber-50 text-amber-700 border border-amber-100'}`}>
-                  {item.status}
-                </span>
+                {/* DOCUMENT HEADER */}
+                <div className="bg-blue-900 text-white p-8 md:p-12 border-b-4 border-blue-500">
+                    <div className="flex justify-between items-start">
+                        <div>
+                            <div className="flex items-center gap-2 mb-2 opacity-80">
+                                <ShieldCheck className="w-6 h-6" />
+                                <span className="font-mono tracking-widest uppercase text-sm">Official SmartEstate Report</span>
                             </div>
-                        ))}
-                    </div>
-                </div>
-
-                {/* Valuation Section */}
-                <div className="mb-10">
-                    <h3 className="text-lg font-bold text-gray-900 mb-6 border-l-4 border-blue-600 pl-4 uppercase tracking-wider">2. AI Valuation Estimate</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-0 border border-gray-200 rounded-lg overflow-hidden divide-y md:divide-y-0 md:divide-x divide-gray-200 bg-gray-50">
-                        <div className="p-6 text-center">
-                            <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Est. Market Value</div>
-                            <div className="text-2xl font-black text-gray-900">${report.valuation.estimated_value.toLocaleString()}</div>
+                            <h1 className="text-3xl md:text-4xl font-black mb-2">Due Diligence Analysis</h1>
+                            <p className="text-blue-200">Ref: #{id.toUpperCase()} • Generated: {data.generated_at}</p>
                         </div>
-                        <div className="p-6 text-center">
-                            <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Market Trend</div>
-                            <div className="text-xl font-bold text-emerald-600">{report.valuation.market_trend}</div>
-                        </div>
-                        <div className="p-6 text-center">
-                            <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Price / m²</div>
-                            <div className="text-xl font-bold text-gray-900">${report.valuation.price_per_sqm.toFixed(2)}</div>
+                        <div className="text-right hidden md:block">
+                            <div className="text-5xl font-black">{data.risk_score}</div>
+                            <div className="text-sm font-bold opacity-80 uppercase tracking-wider">Risk Score</div>
                         </div>
                     </div>
                 </div>
 
-                {/* Footer disclaimer */}
-                <div className="mt-16 pt-8 border-t border-gray-200 text-center">
-                    <p className="text-[10px] text-gray-400 uppercase tracking-wider leading-relaxed max-w-2xl mx-auto">
-                        This report is generated by Artificial Intelligence based on available digital records.
-                        SmartEstate AI does not replace professional legal counsel or physical inspection.
-                        © 2025 SmartEstate AI. All rights reserved.
-                    </p>
-                </div>
+                <div className="p-8 md:p-12 space-y-12">
 
+                    {/* 1. EXECUTIVE SUMMARY */}
+                    <section>
+                        <h3 className="text-gray-400 font-bold uppercase tracking-wider text-xs mb-4 flex items-center gap-2">
+                            <FileText className="w-4 h-4" /> Executive Summary
+                        </h3>
+                        <div className={`p-6 rounded-lg border-l-4 ${data.risk_score < 30 ? 'bg-emerald-50 border-emerald-500' : 'bg-orange-50 border-orange-500'}`}>
+                            <h4 className={`font-bold text-lg mb-2 ${data.risk_score < 30 ? 'text-emerald-800' : 'text-orange-800'}`}>
+                                {data.risk_score < 30 ? 'Safe Investment Verified' : 'Caution Recommended'}
+                            </h4>
+                            <p className="text-gray-700 leading-relaxed">
+                                {data.ai_summary || "Automated analysis complete. Review the specific checks below for details."}
+                            </p>
+                        </div>
+                    </section>
+
+                    {/* 2. MARKET VALUATION */}
+                    <section>
+                        <h3 className="text-gray-400 font-bold uppercase tracking-wider text-xs mb-6 flex items-center gap-2">
+                            <TrendingUp className="w-4 h-4" /> Valuation & Market
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div className="bg-gray-50 p-6 rounded-xl border border-gray-100">
+                                <div className="text-gray-500 text-xs font-bold uppercase mb-1">Estimated Value</div>
+                                <div className="text-2xl font-black text-gray-900">
+                                    ${data.valuation?.estimated_value?.toLocaleString() || "N/A"}
+                                </div>
+                                <div className="text-green-600 text-xs font-bold mt-2 flex items-center">
+                                    <Activity className="w-3 h-3 mr-1" /> AI Confidence: {data.valuation?.confidence || "N/A"}
+                                </div>
+                            </div>
+
+                            <div className="bg-gray-50 p-6 rounded-xl border border-gray-100">
+                                <div className="text-gray-500 text-xs font-bold uppercase mb-1">Market Trend</div>
+                                <div className="text-lg font-bold text-blue-600">
+                                    {data.valuation?.market_trend || "Stable"}
+                                </div>
+                                <p className="text-xs text-gray-400 mt-2">Based on last 12 months data</p>
+                            </div>
+
+                            <div className="bg-gray-50 p-6 rounded-xl border border-gray-100">
+                                <div className="text-gray-500 text-xs font-bold uppercase mb-1">Price / sqm</div>
+                                <div className="text-lg font-bold text-gray-900">
+                                    ${data.valuation?.price_per_sqm || 0}
+                                </div>
+                                <p className="text-xs text-gray-400 mt-2">Suburb Avg: ${(data.valuation?.price_per_sqm * 1.1).toFixed(0)}</p>
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* 3. LEGAL CHECKS TABLE */}
+                    <section>
+                        <h3 className="text-gray-400 font-bold uppercase tracking-wider text-xs mb-6 flex items-center gap-2">
+                            <ShieldCheck className="w-4 h-4" /> Legal Due Diligence
+                        </h3>
+                        <div className="border border-gray-200 rounded-lg overflow-hidden">
+                            <table className="w-full text-left text-sm">
+                                <thead className="bg-gray-50 text-gray-500 font-bold border-b border-gray-200">
+                                <tr>
+                                    <th className="p-4">Check Type</th>
+                                    <th className="p-4">Status</th>
+                                    <th className="p-4">Details / Findings</th>
+                                </tr>
+                                </thead>
+                                <tbody className="divide-y divide-gray-100">
+                                {data.legal_checks?.map((item, index) => (
+                                    <tr key={index}>
+                                        <td className="p-4 font-medium text-gray-900">{item.check}</td>
+                                        <td className="p-4">
+                                            {item.status === 'PASSED' && <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"><CheckCircle className="w-3 h-3 mr-1"/> Passed</span>}
+                                            {item.status === 'WARNING' && <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800"><AlertTriangle className="w-3 h-3 mr-1"/> Warning</span>}
+                                            {item.status === 'CRITICAL' && <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800"><AlertTriangle className="w-3 h-3 mr-1"/> Critical</span>}
+                                        </td>
+                                        <td className="p-4 text-gray-600">{item.details}</td>
+                                    </tr>
+                                ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+
+                    {/* FOOTER */}
+                    <div className="border-t border-gray-100 pt-8 mt-12 text-center text-xs text-gray-400">
+                        <p className="mb-2">This report is generated by SmartEstate AI (Prototype v0.1). Information is based on available public records and AI estimates.</p>
+                        <p>Generated ID: {Math.random().toString(36).substr(2, 9).toUpperCase()} • Not a legal guarantee.</p>
+                    </div>
+
+                </div>
             </div>
         </div>
     );
