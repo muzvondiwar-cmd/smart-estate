@@ -325,7 +325,7 @@ const PropertyDetails = () => {
                             </div>
                         </div>
 
-                        <MortgageCalculator price={property.price}>
+                        <MortgageCalculator price={property.price}/>
 
                         <button
                             onClick={() => setShowContactModal(true)}
