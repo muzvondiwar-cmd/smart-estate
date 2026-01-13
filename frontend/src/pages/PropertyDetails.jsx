@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import MortgageCalculator from '../components/MortgageCalculator';
 import axios from 'axios';
 import { MapPin, BedDouble, Bath, Square, ShieldCheck, CheckCircle, AlertTriangle, FileText, ArrowLeft, Phone, Mail, Send, X, Calendar, User } from 'lucide-react';
 import { API_URL } from '../config';
@@ -323,6 +324,8 @@ const PropertyDetails = () => {
                                 <div className="text-xs text-gray-500 flex items-center gap-1"><CheckCircle className="w-3 h-3 text-emerald-500"/> Identity Verified</div>
                             </div>
                         </div>
+
+                        <MortgageCalculator price={property.price}>
 
                         <button
                             onClick={() => setShowContactModal(true)}
